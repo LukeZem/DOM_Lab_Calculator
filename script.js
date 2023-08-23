@@ -4,19 +4,29 @@ const opButtons = document.querySelectorAll("#op-btn-container .button");
 const clearButton = document.querySelector(".clear-button");
 const equalsButton = document.querySelector(".equals-button");
 
-let currentInput = "";
+let currentInput = '';
 let operator = null;
+let useOperator = null;
 let prevInput = null;
+let calculationHistory = [];
+
+
 
 // Function to update the display
 function updateDisplay() {
-    display.value = currentInput;
+    display.value = calculationHistory.join(" ") + " " + currentInput;
 }
+
+function realTimeUpdate() {
+    
+}
+
+
 
 // Add click event listeners to number buttons
 numButtons.forEach(button => {
     button.addEventListener("click", () => {
-        if (currentInput === "" || operator === "=") {
+        if (currentInput === '' || operator === "=") {
             currentInput = button.textContent;
         } else {
             currentInput += button.textContent;
@@ -35,42 +45,54 @@ opButtons.forEach(button => {
         }
         operator = button.textContent;
         prevInput = currentInput;
-        currentInput = "";
+        currentInput = '';
     });
 });
 
 // Add click event listener to equals button
 equalsButton.addEventListener("click", () => {
     if (operator !== null) {
-        currentInput = operate(parseFloat(prevInput), parseFloat(currentInput), operator);
-        updateDisplay();
+        const result = operate(parseFloat(prevInput), parseFloat(currentInput), operator);
         operator = "=";
+        calculationHistory.push(`${prevInput} ${useOperator} ${currentInput} ${operator}`);
+        currentInput = result.toString();
+        updateDisplay();
     }
 });
 
+
+
 // Add click event listener to clear button
 clearButton.addEventListener("click", () => {
-    currentInput = "";
+    currentInput = '';
     operator = null;
+    useOperator = null;
     prevInput = null;
+    calculationHistory = [];
     updateDisplay();
 });
+
 
 // Perform basic arithmetic operations
 function operate(a, b, op) {
     switch (op) {
         case "+":
+            useOperator = "+"
             return a + b;
         case "-":
+            useOperator = "-"
             return a - b;
         case "*":
+            useOperator = "*"
             return a * b;
         case "/":
+            useOperator = "/"
             return b !== 0 ? a / b : "Error";
         default:
             return b;
     }
 }
+
 
 // Initialize the display
 updateDisplay();
