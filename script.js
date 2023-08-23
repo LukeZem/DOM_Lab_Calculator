@@ -4,7 +4,7 @@ const opButtons = document.querySelectorAll("#op-btn-container .button");
 const clearButton = document.querySelector(".clear-button");
 const equalsButton = document.querySelector(".equals-button");
 
-let currentInput = '';
+let currentInput = 0;
 let operator = null;
 let useOperator = null;
 let prevInput = null;
@@ -14,11 +14,22 @@ let calculationHistory = [];
 
 // Function to update the display
 function updateDisplay() {
-    display.value = calculationHistory.join(" ") + " " + currentInput;
+    if (currentInput == 0) {
+        display.value = "Math is Hard"
+    } else {
+        display.value = calculationHistory.join(" ") + " " + currentInput;
+    }
 }
 
-function realTimeUpdate() {
-    
+function realTimeDisplay(input) {
+    if (display.value == "Math is Hard") {
+        display.value = input.toString()
+    } else if (typeof input != "string") {
+        display.value += input.toString()
+    } else {
+        display.value += input
+    }
+
 }
 
 
@@ -26,12 +37,12 @@ function realTimeUpdate() {
 // Add click event listeners to number buttons
 numButtons.forEach(button => {
     button.addEventListener("click", () => {
-        if (currentInput === '' || operator === "=") {
+        if (currentInput === 0 || operator === "=") {
             currentInput = button.textContent;
         } else {
             currentInput += button.textContent;
         }
-        updateDisplay();
+        realTimeDisplay(currentInput);
     });
 });
 
@@ -41,11 +52,11 @@ opButtons.forEach(button => {
         if (operator !== null) {
             // Calculate and update the result
             currentInput = operate(parseFloat(prevInput), parseFloat(currentInput), operator);
-            updateDisplay();
         }
         operator = button.textContent;
         prevInput = currentInput;
-        currentInput = '';
+        currentInput = 0;
+        realTimeDisplay(operator);
     });
 });
 
