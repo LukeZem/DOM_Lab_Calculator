@@ -4,70 +4,67 @@ const opButtons = document.querySelectorAll("#op-btn-container .button");
 const clearButton = document.querySelector(".clear-button");
 const equalsButton = document.querySelector(".equals-button");
 
-let currentInput = 0;
+
 let operator = null;
-let useOperator = null;
+let currentBtn;
+let currentInput = '';
 let prevInput = null;
-let calculationHistory = [];
-
-
+let inputHistory = [];
 
 // Function to update the display
 function updateDisplay() {
-    if (currentInput == 0) {
+    if (currentInput == '') {
         display.value = "Math is Hard"
     } else {
-        display.value = calculationHistory.join(" ") + " " + currentInput;
+        display.value = currentInput;
     }
 }
 
-function realTimeDisplay(input) {
-    if (display.value == "Math is Hard") {
-        display.value = input.toString()
-    } else if (typeof input != "string") {
-        display.value += input.toString()
-    } else {
-        display.value += input
-    }
-
+function realTimeDisplay() {
+    display.value = inputHistory.join("");
 }
-
-
 
 // Add click event listeners to number buttons
 numButtons.forEach(button => {
     button.addEventListener("click", () => {
-        if (currentInput === 0 || operator === "=") {
+        if (display.value === "Math is Hard") {
             currentInput = button.textContent;
+            inputHistory.push(button.textContent);
         } else {
             currentInput += button.textContent;
+            inputHistory.push(button.textContent);
         }
-        realTimeDisplay(currentInput);
+        realTimeDisplay();
     });
 });
 
 // Add click event listeners to operator buttons
 opButtons.forEach(button => {
     button.addEventListener("click", () => {
+        button.classList.add("active")
         if (operator !== null) {
             // Calculate and update the result
             currentInput = operate(parseFloat(prevInput), parseFloat(currentInput), operator);
+            updateDisplay();
         }
         operator = button.textContent;
         prevInput = currentInput;
         currentInput = 0;
-        realTimeDisplay(operator);
+        display.value = prevInput;
+        inputHistory = [];
     });
 });
+
 
 // Add click event listener to equals button
 equalsButton.addEventListener("click", () => {
     if (operator !== null) {
-        const result = operate(parseFloat(prevInput), parseFloat(currentInput), operator);
-        operator = "=";
-        calculationHistory.push(`${prevInput} ${useOperator} ${currentInput} ${operator}`);
-        currentInput = result.toString();
+        currentInput = operate(parseFloat(prevInput), parseFloat(currentInput), operator);
         updateDisplay();
+        operator = "=";
+        opButtons.forEach(opBtn => {
+            opBtn.classList.remove("active");
+        });
     }
 });
 
@@ -77,9 +74,8 @@ equalsButton.addEventListener("click", () => {
 clearButton.addEventListener("click", () => {
     currentInput = '';
     operator = null;
-    useOperator = null;
     prevInput = null;
-    calculationHistory = [];
+    inputHistory = [];
     updateDisplay();
 });
 
@@ -88,21 +84,18 @@ clearButton.addEventListener("click", () => {
 function operate(a, b, op) {
     switch (op) {
         case "+":
-            useOperator = "+"
             return a + b;
         case "-":
-            useOperator = "-"
             return a - b;
         case "*":
-            useOperator = "*"
             return a * b;
         case "/":
-            useOperator = "/"
-            return b !== 0 ? a / b : "Error";
+            return b !== 0 ? a / b : "UNDEFINED!!!";
         default:
             return b;
     }
 }
+
 
 
 // Initialize the display

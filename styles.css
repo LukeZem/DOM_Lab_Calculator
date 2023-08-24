@@ -107,3 +107,10 @@ h1 {
     background-color: grey;
 }
 /* **********************************************************/
+
+
+.active {
+    background-color: #00aaff; /* Change this to your desired active state styling */
+    color: #fff;
+  }
+  
